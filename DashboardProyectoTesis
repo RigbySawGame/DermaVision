@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skincare Inteligente - Proyecto Tesis 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Configuración Tailwind y Estilos Personalizados -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6', // Teal para tecnología/IA
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        },
+                        skin: {
+                            100: '#ffe4e6', // Rose claro para cuidado de la piel
+                            500: '#f43f5e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos generales y utilidades */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        
+        /* Ocultar barra de desplazamiento manteniendo funcionalidad */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Contenedor estricto para gráficos Canvas (Evita desbordamientos) */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px; /* Altura base */
+            max-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 280px; }
+        }
+
+        /* Transiciones para interactividad */
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        
+        /* Estilos para pestañas (Tabs) */
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+        .tab-btn.active { border-bottom-color: #0d9488; color: #0d9488; font-weight: 600; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <!-- Chosen Palette: Warm neutrals (Slate) for background/text, Teal for AI/Tech concepts, soft Rose for Skincare concepts. -->
+    <!-- Application Structure Plan: Dashboard/Pitch approach. 
+         1. Hero: Introduces the project and authors.
+         2. Context: Problem & Solution in a clear side-by-side layout using icons.
+         3. Core Metrics: Uses Chart.js to visualize the Operationalization of Variables (SUS, Satisfaction, Privacy) as expected target outcomes, making dry thesis matrices engaging.
+         4. Methodology & Roadmap: Interactive tabs for methodology to save space, and a visual progress bar for the timeline based on the Annex.
+         This structure translates academic requirements into an investor-ready/exploratory format. -->
+    <!-- Visualization & Content Choices: 
+         - Goal: Inform context -> Visual Method: Grid with Unicode icons -> Interaction: Hover effects -> Justifies avoiding dense text.
+         - Goal: Show Variables (SUS, Satisfaction) -> Visual Method: Bar/Doughnut/Pie Canvas Charts -> Interaction: Tooltips -> Library: Chart.js. Translates the annex matrix into visual targets.
+         - Goal: Explain Methodology -> Visual Method: Tabbed Interface -> Interaction: Click to reveal -> Saves vertical space and organizes complex text.
+         - Goal: Show Schedule -> Visual Method: HTML/CSS Progress Bar -> Clear status indication (Completed vs Pending). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Everything is Canvas, HTML, CSS, and Unicode. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Navegación Sticky -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">✨</span>
+                    <span class="font-bold text-slate-800 text-lg tracking-tight">Tesis<span class="text-brand-600">SkincareAI</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#resumen" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Resumen</a>
+                    <a href="#solucion" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">La Solución</a>
+                    <a href="#metricas" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Métricas (Variables)</a>
+                    <a href="#metodo" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Método y Roadmap</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow">
+        <!-- SECCIÓN 1: Hero / Resumen -->
+        <section id="resumen" class="pt-20 pb-16 bg-gradient-to-b from-white to-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="inline-block px-4 py-1 rounded-full bg-brand-50 text-brand-600 font-semibold text-xs uppercase tracking-wider mb-6 border border-brand-100">
+                    Proyecto de Tesis - Ingeniería de Sistemas Computacionales
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">
+                    Aplicación Móvil Basada en <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-teal-400">Visión Artificial</span><br>
+                    para Rutinas Personalizadas de Skincare
+                </h1>
+                <p class="mt-4 text-xl text-slate-600 max-w-3xl mx-auto font-light">
+                    Democratizando el cuidado dermatológico mediante inteligencia artificial. Escanea tu rostro y recibe una rutina adaptada a tus necesidades únicas.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4 text-sm text-slate-500">
+                    <div class="flex items-center justify-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                        <span>👨‍💻</span> <b>Autores:</b> C. Pacheco, D. Sotelo
+                    </div>
+                    <div class="flex items-center justify-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                        <span>🎓</span> <b>Asesor:</b> Dr. Carlos Rodriguez
+                    </div>
+                    <div class="flex items-center justify-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                        <span>📍</span> Lima, Perú (2025)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: Problema y Solución -->
+        <section id="solucion" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">El Contexto de la Investigación</h2>
+                    <p class="mt-4 text-slate-500 max-w-2xl mx-auto">Comprendiendo la brecha actual en el cuidado de la piel y cómo la tecnología propone resolverla de forma escalable.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <!-- Problema -->
+                    <div class="bg-skin-100/30 p-8 rounded-2xl border border-skin-100 card-hover">
+                        <div class="w-12 h-12 bg-skin-100 text-skin-500 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-sm">
+                            ⚠️
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">El Problema</h3>
+                        <ul class="space-y-4 text-slate-600">
+                            <li class="flex items-start gap-3">
+                                <span class="text-skin-500 mt-1">▪</span>
+                                <span>Cuidar la piel es una tendencia masiva, pero abunda la desinformación y el uso de rutinas genéricas.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-skin-500 mt-1">▪</span>
+                                <span>Las consultas dermatológicas privadas suelen ser de alto costo y de difícil acceso para la población general.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-skin-500 mt-1">▪</span>
+                                <span>El uso de productos inadecuados puede empeorar condiciones dermatológicas existentes.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Solución -->
+                    <div class="bg-brand-50/50 p-8 rounded-2xl border border-brand-100 card-hover">
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-sm">
+                            📱
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">La Solución Propuesta</h3>
+                        <p class="text-slate-600 mb-6">Desarrollo de una aplicación móvil impulsada por modelos de Machine Learning (Visión Artificial) con los siguientes flujos:</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm text-center">
+                                <div class="text-2xl mb-2">📸</div>
+                                <div class="text-sm font-semibold text-slate-700">Escaneo Facial</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm text-center">
+                                <div class="text-2xl mb-2">🧠</div>
+                                <div class="text-sm font-semibold text-slate-700">Análisis IA</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm text-center">
+                                <div class="text-2xl mb-2">🧴</div>
+                                <div class="text-sm font-semibold text-slate-700">Rutina Personalizada</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm text-center">
+                                <div class="text-2xl mb-2">📈</div>
+                                <div class="text-sm font-semibold text-slate-700">Seguimiento</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: Cuadro de Variables (Métricas Interactivas) -->
+        <section id="metricas" class="py-16 bg-slate-50 border-y border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Matriz de Variables y Objetivos de Medición</h2>
+                    <p class="mt-4 text-slate-500 max-w-3xl mx-auto">Visualización de las variables dependientes extraídas del Anexo del documento. Los gráficos representan los rangos de medición y los objetivos hipotéticos de éxito para la validación de la aplicación.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Variable 1: SUS -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+                        <div class="mb-4 flex-grow">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span>📊</span> Variable: Usabilidad
+                            </h3>
+                            <p class="text-sm text-slate-500 mt-1">Escala System Usability Scale (SUS). Rango: 0-100 puntos. Mide qué tan fácil e intuitivo es el sistema.</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <!-- Contenedor estricto para Chart.js -->
+                            <div class="chart-container w-full">
+                                <canvas id="susChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-xs text-center text-slate-400 bg-slate-50 py-2 rounded">Interactúa con las barras para ver detalles</div>
+                    </div>
+
+                    <!-- Variable 2: Satisfacción -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+                        <div class="mb-4 flex-grow">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span>⭐</span> Variable: Satisfacción
+                            </h3>
+                            <p class="text-sm text-slate-500 mt-1">Escala Likert (1 a 5). Percepción subjetiva positiva tras el uso post-test de la app.</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <!-- Contenedor estricto para Chart.js -->
+                            <div class="chart-container w-full">
+                                <canvas id="satChart"></canvas>
+                            </div>
+                        </div>
+                         <div class="mt-4 text-xs text-center text-slate-400 bg-slate-50 py-2 rounded">Pasa el cursor sobre los segmentos</div>
+                    </div>
+
+                    <!-- Variable 3: Privacidad -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+                        <div class="mb-4 flex-grow">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span>🔒</span> Variable: Privacidad
+                            </h3>
+                            <p class="text-sm text-slate-500 mt-1">Nivel de confianza en el manejo de datos faciales. Categórica Ordinal (Alto/Medio/Bajo).</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <!-- Contenedor estricto para Chart.js -->
+                            <div class="chart-container w-full">
+                                <canvas id="privChart"></canvas>
+                            </div>
+                        </div>
+                         <div class="mt-4 text-xs text-center text-slate-400 bg-slate-50 py-2 rounded">Distribución objetivo esperada</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: Metodología y Cronograma -->
+        <section id="metodo" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    
+                    <!-- Metodología (Tabs Interactivas) -->
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-900 mb-6">Marco Metodológico</h2>
+                        <p class="text-slate-500 mb-8">Navega por las pestañas para conocer los aspectos formales del diseño de la investigación propuestos en el Capítulo 2.</p>
+                        
+                        <!-- Navegación de Tabs -->
+                        <div class="flex border-b border-slate-200 mb-6 overflow-x-auto no-scrollbar">
+                            <button class="tab-btn active px-4 py-3 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 whitespace-nowrap" onclick="openTab(event, 'tab-diseno')">Diseño</button>
+                            <button class="tab-btn px-4 py-3 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 whitespace-nowrap" onclick="openTab(event, 'tab-poblacion')">Población / Muestra</button>
+                            <button class="tab-btn px-4 py-3 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 whitespace-nowrap" onclick="openTab(event, 'tab-etica')">Aspectos Éticos</button>
+                        </div>
+
+                        <!-- Contenido Tabs -->
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100 min-h-[250px]">
+                            <div id="tab-diseno" class="tab-content active">
+                                <h4 class="font-bold text-brand-600 mb-2 flex items-center gap-2"><span>📐</span> Diseño de Investigación</h4>
+                                <p class="text-slate-700 leading-relaxed text-sm">
+                                    El estudio propone un diseño <strong>Pre-experimental</strong>. Se realizará un pre-test para evaluar el conocimiento y estado inicial de los usuarios, seguido por la intervención (uso de la aplicación móvil basada en IA durante un periodo determinado), y finalizará con un post-test para evaluar las variables dependientes (Usabilidad, Satisfacción, Privacidad).
+                                </p>
+                            </div>
+                            <div id="tab-poblacion" class="tab-content">
+                                <h4 class="font-bold text-brand-600 mb-2 flex items-center gap-2"><span>👥</span> Población y Muestra</h4>
+                                <p class="text-slate-700 leading-relaxed text-sm">
+                                    La población objetivo comprende individuos interesados en el cuidado facial que poseen un dispositivo móvil inteligente. La muestra se seleccionará mediante un muestreo <strong>no probabilístico por conveniencia</strong>, garantizando que los participantes firmen un consentimiento informado para el uso de sus imágenes para el análisis de la IA local.
+                                </p>
+                            </div>
+                            <div id="tab-etica" class="tab-content">
+                                <h4 class="font-bold text-brand-600 mb-2 flex items-center gap-2"><span>⚖️</span> Aspectos Éticos</h4>
+                                <p class="text-slate-700 leading-relaxed text-sm">
+                                    El proyecto se alinea estrictamente con normativas de protección de datos. El procesamiento de las imágenes faciales se diseña para ser anonimizado o procesado en el dispositivo (Edge AI) siempre que sea posible. Los datos de la evaluación se mantendrán confidenciales y se utilizarán exclusivamente para fines de validación académica y mejora del modelo.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Roadmap / Anexo 3 -->
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-900 mb-6">Estado del Proyecto</h2>
+                        <p class="text-slate-500 mb-8">Basado en el Anexo 3: Cronograma de Desarrollo y Culminación de Tesis.</p>
+
+                        <div class="space-y-6">
+                            
+                            <!-- Fase 1 -->
+                            <div class="relative">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm shadow-md z-10">✓</div>
+                                    <h3 class="ml-4 text-lg font-semibold text-slate-800">1. Planificación</h3>
+                                    <span class="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-100 text-green-800">Completado</span>
+                                </div>
+                                <div class="ml-4 pl-8 pb-4 border-l-2 border-brand-200">
+                                    <p class="text-sm text-slate-500">Revisión bibliográfica, definición del problema, objetivos y ajuste del plan de tesis.</p>
+                                </div>
+                            </div>
+
+                            <!-- Fase 2 -->
+                            <div class="relative">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm shadow-inner z-10">2</div>
+                                    <h3 class="ml-4 text-lg font-semibold text-slate-800">2. Desarrollo Técnico</h3>
+                                    <span class="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Pendiente</span>
+                                </div>
+                                <div class="ml-4 pl-8 pb-4 border-l-2 border-slate-200 border-dashed">
+                                    <p class="text-sm text-slate-500">Desarrollo de la App móvil (Frontend/Backend) y Entrenamiento del Modelo de Visión Artificial (IA).</p>
+                                    <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
+                                      <div class="bg-amber-400 h-2 rounded-full" style="width: 15%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Fase 3 -->
+                             <div class="relative">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-sm z-10">3</div>
+                                    <h3 class="ml-4 text-lg font-semibold text-slate-500">3. Pruebas y Recolección</h3>
+                                </div>
+                                <div class="ml-4 pl-8 pb-4 border-l-2 border-slate-100 border-dashed">
+                                    <p class="text-sm text-slate-400">Aplicación del sistema a la muestra, recolección de métricas (SUS, Satisfacción) y análisis estadístico.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+            <p>Dashboard Interactivo del Proyecto de Tesis "Aplicación Móvil Basada en Visión Artificial para el Cuidado del Rostro" - 2026</p>
+            <p class="mt-2 text-slate-500">Documento base extraído de: Proyecto Tesis 2026.docx</p>
+        </div>
+    </footer>
+
+    <!-- Lógica JavaScript Interactivas y Gráficos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Lógica de Navegación de Pestañas (Methodology) ---
+            window.openTab = function(evt, tabName) {
+                let i, tabcontent, tablinks;
+                // Ocultar todos los contenidos
+                tabcontent = document.getElementsByClassName("tab-content");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].classList.remove("active");
+                }
+                // Quitar estilo activo de los botones
+                tablinks = document.getElementsByClassName("tab-btn");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("active");
+                }
+                // Mostrar actual y poner botón activo
+                document.getElementById(tabName).classList.add("active");
+                evt.currentTarget.classList.add("active");
+            };
+
+            // --- Configuración Global Común para Chart.js ---
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b'; // slate-500
+            
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false, // CRÍTICO: Permite que el contenedor div dicte la altura
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)', // slate-900
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 13 },
+                        bodyFont: { size: 13 }
+                    }
+                }
+            };
+
+            // --- Gráfico 1: Variable SUS (Bar Chart) ---
+            const ctxSus = document.getElementById('susChart').getContext('2d');
+            new Chart(ctxSus, {
+                type: 'bar',
+                data: {
+                    labels: ['Promedio Industria', 'Mínimo Aceptable', 'Objetivo Tesis'],
+                    datasets: [{
+                        label: 'Puntaje SUS (0-100)',
+                        data: [68, 70, 85], // Datos simulados para ilustrar el objetivo de la variable
+                        backgroundColor: [
+                            'rgba(148, 163, 184, 0.6)', // slate
+                            'rgba(244, 63, 94, 0.6)',   // rose
+                            'rgba(20, 184, 166, 0.8)'   // teal (brand)
+                        ],
+                        borderColor: [
+                            'rgb(148, 163, 184)',
+                            'rgb(244, 63, 94)',
+                            'rgb(20, 184, 166)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            grid: { color: 'rgba(226, 232, 240, 0.5)' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // --- Gráfico 2: Variable Satisfacción (Doughnut Chart) ---
+            // Representa la distribución esperada en la escala Likert (1-5)
+            const ctxSat = document.getElementById('satChart').getContext('2d');
+            new Chart(ctxSat, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Muy Insat. (1)', 'Insatisfecho (2)', 'Neutral (3)', 'Satisfecho (4)', 'Muy Satisfecho (5)'],
+                    datasets: [{
+                        data: [2, 3, 15, 45, 35], // Distribución porcentual esperada
+                        backgroundColor: [
+                            '#ef4444', // red
+                            '#f97316', // orange
+                            '#eab308', // yellow
+                            '#2dd4bf', // teal light
+                            '#0d9488'  // teal dark (brand)
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#f8fafc',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    cutout: '60%',
+                    plugins: {
+                        ...commonOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.raw + '% de usuarios';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- Gráfico 3: Variable Percepción de Privacidad (Pie Chart) ---
+            const ctxPriv = document.getElementById('privChart').getContext('2d');
+            new Chart(ctxPriv, {
+                type: 'pie',
+                data: {
+                    labels: ['Confianza Alta', 'Confianza Media', 'Confianza Baja'],
+                    datasets: [{
+                        data: [75, 20, 5], // Objetivo de percepción de seguridad
+                        backgroundColor: [
+                            '#10b981', // emerald
+                            '#fbbf24', // amber
+                            '#f43f5e'  // rose
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#f8fafc',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        ...commonOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
