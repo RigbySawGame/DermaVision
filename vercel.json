@@ -3,11 +3,17 @@
     "outputDirectory": "app/dist",
     "rewrites": [
         {
+<<<<<<< HEAD
             "source": "/app/(.*)",
             "destination": "/app/index.html"
         },
         {
             "source": "/",
+=======
+
+            
+            "source": "/(.*)",
+>>>>>>> 55b21ca94ab6e89729b0b9cd905095d7cf28015b
             "destination": "/index.html"
         }
     ]
