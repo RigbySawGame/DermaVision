@@ -4,10 +4,10 @@
     "rewrites": [
         {
             "source": "/app/(.*)",
-            "destination": "/app/index.html"
+            "destination": "/index.html"
         },
         {
-            "source": "/",
+            "source": "/app",
             "destination": "/index.html"
         }
     ]
